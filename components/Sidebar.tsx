@@ -10,8 +10,8 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <section className="sticky left-0 top-0 flex h-screen w-fit flex-col  justify-between  bg-dark-1 p-6 pt-28 text-white max-sm:hidden lg:w-[264px]">
-      <div className="flex flex-1 flex-col gap-6">
+    <section className="sticky left-0 top-0 flex h-screen  flex-col  justify-between  bg-dark-1 p-6 pt-28 text-white lg:w-[264px]">
+      <div className="flex flex-col md:w-auto w-[50px] gap-10 md:gap-6 ">
         {sidebarLinks.map((item:any) => {
           const isActive = pathname === item.route || pathname.startsWith(`${item.route}/`);
           return (

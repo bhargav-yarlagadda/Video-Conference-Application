@@ -31,7 +31,7 @@ const Navbar = () => {
           YOOM
         </p>
       </Link>
-      <div>
+      <div className='px-4'> 
         <UserButton />
       </div>
     </nav>
