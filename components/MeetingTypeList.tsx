@@ -13,6 +13,7 @@ const MeetingTypeList = () => {
     "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
   >(undefined);
   const {user} = useUser()
+  // this is a client side object 
   const client = useStreamVideoClient()
   const [values,setValues] = useState({
     dateTime : new Date(),
@@ -29,8 +30,7 @@ const MeetingTypeList = () => {
       const id = crypto.randomUUID();
       const call = client.call('default', id);
       if (!call) throw new Error('Failed to create meeting');
-      const startsAt =
-        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+      const startsAt =values.dateTime.toISOString() || new Date(Date.now()).toISOString();
       const description = values.description || 'Instant Meeting';
       await call.getOrCreate({
         data: {
@@ -59,8 +59,10 @@ const MeetingTypeList = () => {
         className="bg-sky-400"
         description="Start an instant meeting"
         handleClick={() => {
+          setMeetingState("isInstantMeeting")
           createMeeting()
-          setMeetingState("isInstantMeeting")}}
+        }
+      }
       />
       <HomeCard
         img="/icons/join-meeting.svg"
