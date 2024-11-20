@@ -25,10 +25,10 @@ const Navbar = () => {
           width={32}
           height={32}
           alt="yoom logo"
-          className="max-sm:size-10"
+          className="max-sm:size-10 relative left-2 md:left-0"
         />
         <p className="text-[26px] font-extrabold text-white max-sm:hidden">
-          YOOM
+          Conferencer
         </p>
       </Link>
       <div className='px-4'> 

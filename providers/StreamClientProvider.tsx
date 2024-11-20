@@ -3,9 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { StreamVideoClient, StreamVideo } from "@stream-io/video-react-sdk";
 import { useUser } from "@clerk/nextjs";
-
 import { tokenProvider } from "@/actions/stream.actions";
-
 import React from "react";
 
 const Loader = () => {
@@ -33,7 +31,7 @@ const StreamVideoProvider = ({ children }: { children: ReactNode }) => {
         name: user?.username || user?.id,
         image: user?.imageUrl,
       },
-      tokenProvider,
+      tokenProvider:tokenProvider
     });
 
     setVideoClient(client);

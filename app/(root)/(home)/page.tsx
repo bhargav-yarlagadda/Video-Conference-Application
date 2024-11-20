@@ -17,11 +17,11 @@ const Home = () => {
           src={BgImage}
           alt="Background Image"
           layout="fill"
-          className="object-cover"
+          className="object-cover "
           priority
         />
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-black/100 md:bg-black/40"></div>
 
         {/* Time and Date */}
         <div className="relative z-10 p-8 md:p-12 lg:p-16">

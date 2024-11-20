@@ -56,7 +56,7 @@ const MeetingTypeList = () => {
       <HomeCard
         img="/icons/add-meeting.svg"
         title="New Meeting"
-        className="bg-sky-400"
+        className="bg-sky-400 hover:scale-105 transition-all ease-in duration-200"
         description="Start an instant meeting"
         handleClick={() => {
           setMeetingState("isInstantMeeting")
@@ -68,21 +68,21 @@ const MeetingTypeList = () => {
         img="/icons/join-meeting.svg"
         title="Join Meeting"
         description="via invitation link"
-        className="bg-pink-500"
+        className="bg-pink-500  hover:scale-105 transition-all ease-in duration-200"
         handleClick={() => setMeetingState("isJoiningMeeting")}
       />
       <HomeCard
         img="/icons/schedule.svg"
         title="Schedule Meeting"
         description="Plan your meeting"
-        className="bg-purple-700"
+        className="bg-purple-700  hover:scale-105 transition-all ease-in duration-200"
         handleClick={() => setMeetingState("isScheduleMeeting")}
       />
       <HomeCard
         img="/icons/recordings.svg"
         title="View Recordings"
         description="Meeting Recordings"
-        className="bg-yellow-500"
+        className="bg-yellow-500  hover:scale-105 transition-all ease-in duration-200"
       />
 
       {/* Schedule Meeting Modal */}
