@@ -13,7 +13,7 @@ import MeetingRoom from '@/components/MeetingRoom';
 
 const Loader = () => {
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-80 backdrop-blur-md z-50">
+    <div className="fixed inset-0 flex justify-center h-screen w-screen items-center bg-white bg-opacity-80 backdrop-blur-md z-50">
       <div className="w-16 h-16 border-4 border-t-4 border-blue-500 rounded-full animate-spin border-t-transparent shadow-lg"></div>
     </div>
   );

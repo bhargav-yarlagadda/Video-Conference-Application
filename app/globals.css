@@ -17,5 +17,20 @@
 body {
   color: var(--foreground);
   background: var(--background);
+  scroll-behavior: smooth;  /* Use smooth scroll behavior */
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom scrollbar width */
+::-webkit-scrollbar {
+  width: 0px; /* Set the width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Thumb color */
+  border-radius: 10px; /* Round the corners of the scrollbar thumb */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Track color */
 }

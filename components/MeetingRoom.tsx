@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   CallStatsButton,
   CallingState,
@@ -10,6 +10,8 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { AiOutlineAudio, AiOutlineVideoCamera } from "react-icons/ai";
 import { useUser } from "@clerk/nextjs";
+import { StreamVideoParticipant } from "@stream-io/video-react-sdk";
+import { useCalls } from '@stream-io/video-react-sdk';
 
 // Loader Component with a better spinner
 const Loader = () => (
@@ -28,11 +30,7 @@ const CustomVideoPlaceholder = ({
   return (
     <div
       className={`w-[350px] h-[250px] flex justify-center rounded-md items-center bg-blue-500/10 
-        ${
-          participant.isSpeaking
-            ? "border-4 border-blue-600"
-            : "border-2 border-gray-400"
-        }`}
+        ${participant.isSpeaking ? "border-4 border-blue-600" : "border-2 border-gray-400"}`}
       style={style}
     >
       {participant.image ? (
@@ -42,13 +40,12 @@ const CustomVideoPlaceholder = ({
           alt={participant.sessionId}
         />
       ) : (
-        <span className="text-gray-600">
-          {participant.name || participant.sessionId}
-        </span>
+        <span className="text-gray-600">{participant.name || participant.sessionId}</span>
       )}
     </div>
   );
 };
+
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get("personal");
@@ -56,20 +53,20 @@ const MeetingRoom = () => {
 
   const [isMuted, setIsMuted] = useState(false); // State for microphone mute
   const [isVideoOff, setIsVideoOff] = useState(false); // State for video off
-
   const {
     useCallCallingState,
     useMicrophoneState,
     useCameraState,
     useParticipants,
   } = useCallStateHooks();
+  const calls = useCalls();
 
   // Fetch calling state, camera state, and participants outside any conditional rendering
   const callingState = useCallCallingState();
   const { user } = useUser();
   const { microphone, isMute: isMicrophoneMuted } = useMicrophoneState();
   const { camera, isMute: isCameraMuted } = useCameraState();
-  const participants = useParticipants();
+  const participants = useParticipants(); // Directly using the participants list
 
   // Wait until the user has joined the call before rendering the UI
   if (callingState !== CallingState.JOINED) return <Loader />;
@@ -93,7 +90,7 @@ const MeetingRoom = () => {
   };
 
   // Dynamically calculate tile size based on the number of participants
-  const getTileSize = (numParticipants: any) => {
+  const getTileSize = (numParticipants: number) => {
     if (numParticipants <= 3) {
       return "w-[450px] h-[300px]"; // Larger tiles for fewer participants
     }
@@ -101,6 +98,11 @@ const MeetingRoom = () => {
       return "w-[350px] h-[250px]"; // Medium-sized tiles for moderate participants
     }
     return "w-[250px] h-[180px]"; // Smaller tiles for many participants
+  };
+
+  const endCall = async () => {
+    calls[0].leave();
+    router.push('/');
   };
 
   return (
@@ -115,14 +117,12 @@ const MeetingRoom = () => {
         </div>
 
         {/* Participant and End Call controls */}
-        <div className="flex  items-center space-x-4">
+        <div className="flex items-center space-x-4">
           {/* Mute/Unmute mic button */}
           <button
             onClick={toggleMute}
             className={`cursor-pointer rounded-lg px-4 py-2 transition-colors duration-200 ${
-              isMuted
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-[#19232d] hover:bg-[#4c535b]"
+              isMuted ? "bg-red-600 hover:bg-red-700" : "bg-[#19232d] hover:bg-[#4c535b]"
             }`}
           >
             <AiOutlineAudio
@@ -136,9 +136,7 @@ const MeetingRoom = () => {
           <button
             onClick={toggleVideo}
             className={`cursor-pointer rounded-lg px-4 py-2 transition-colors duration-200 ${
-              isVideoOff
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-[#19232d] hover:bg-[#4c535b]"
+              isVideoOff ? "bg-red-600 hover:bg-red-700" : "bg-[#19232d] hover:bg-[#4c535b]"
             }`}
           >
             <AiOutlineVideoCamera
@@ -151,7 +149,7 @@ const MeetingRoom = () => {
           {/* End Call button */}
           {!isPersonalRoom && (
             <button
-              onClick={() => router.push(`/`)}
+              onClick={endCall}
               className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700 text-white transition-colors duration-200"
             >
               End Call
@@ -162,21 +160,19 @@ const MeetingRoom = () => {
 
       {/* Participant Tiles */}
       <div
-        className="flex w-full h-screen overflow-auto flex-wrap justify-around gap-y-12 p-3 pt-12 gap-4 scrollbar-none"
+        className="flex w-full h-screen  overflow-auto flex-wrap justify-around gap-y-12 p-3 pt-8 gap-4 scrollbar-none"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {participants.map((participant) => (
           <div
             key={participant.sessionId}
-            className={`${getTileSize(
-              participants.length
-            )} rounded-md mx-2 my-4 flex justify-center items-center`}
+            className={` ${getTileSize(participants.length)} rounded-md flex  justify-center items-center`}
           >
-            {/* Fixed-size container for the participant view */}
+            
             <ParticipantView
               VideoPlaceholder={CustomVideoPlaceholder}
               participant={participant}
-              className="w-full h-full rounded-md  duration-200"
+              className="w-full  h-full rounded-md duration-200"
             />
           </div>
         ))}
