@@ -40,7 +40,7 @@ const CustomVideoPlaceholder = ({
           alt={participant.sessionId}
         />
       ) : (
-        <span className="text-gray-600">{participant.name || participant.sessionId}</span>
+        <span className="text-gray-600">{participant.name || "Guest User" }</span>
       )}
     </div>
   );
@@ -172,7 +172,7 @@ const MeetingRoom = () => {
             <ParticipantView
               VideoPlaceholder={CustomVideoPlaceholder}
               participant={participant}
-              className="w-full  h-full rounded-md duration-200"
+              className="w-full  h-full "
             />
           </div>
         ))}
