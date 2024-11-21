@@ -1,5 +1,11 @@
 import React from "react";
 import StreamVideoProvider from "@/providers/StreamClientProvider";
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Conference | Meeting Page',
+  description: '...',
+}
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <main>
