@@ -11,27 +11,31 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AiOutlineAudio, AiOutlineVideoCamera } from "react-icons/ai";
 import { useUser } from "@clerk/nextjs";
 import { StreamVideoParticipant } from "@stream-io/video-react-sdk";
-import { useCalls } from '@stream-io/video-react-sdk';
+import { useCalls } from "@stream-io/video-react-sdk";
 
-// Loader Component with a better spinner
 const Loader = () => (
-  <div className="flex justify-center items-center h-full">
+  <div className="flex justify-center items-center h-screen">
     <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
   </div>
 );
-
 const CustomVideoPlaceholder = ({
   participant,
-  style,
+  numParticipants,
+  getTileSize,
 }: {
   participant: any;
-  style?: React.CSSProperties;
+  numParticipants: number;
+  getTileSize: (numParticipants: number) => string;
 }) => {
+  const tileSizeClass = getTileSize(numParticipants);
+
   return (
     <div
-      className={`w-[350px] h-[250px] flex justify-center rounded-md items-center bg-blue-500/10 
-        ${participant.isSpeaking ? "border-4 border-blue-600" : "border-2 border-gray-400"}`}
-      style={style}
+      className={`flex justify-center items-center rounded-md bg-blue-500/10 ${tileSizeClass} ${
+        participant.isSpeaking
+          ? "border-4 border-blue-600"
+          : "border-2 border-gray-400"
+      }`}
     >
       {participant.image ? (
         <img
@@ -40,7 +44,9 @@ const CustomVideoPlaceholder = ({
           alt={participant.sessionId}
         />
       ) : (
-        <span className="text-gray-600">{participant.name || "Guest User" }</span>
+        <span className="text-gray-600">
+          {participant.name || "Guest User"}
+        </span>
       )}
     </div>
   );
@@ -50,9 +56,8 @@ const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get("personal");
   const router = useRouter();
-
-  const [isMuted, setIsMuted] = useState(false); // State for microphone mute
-  const [isVideoOff, setIsVideoOff] = useState(false); // State for video off
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
   const {
     useCallCallingState,
     useMicrophoneState,
@@ -61,68 +66,63 @@ const MeetingRoom = () => {
   } = useCallStateHooks();
   const calls = useCalls();
 
-  // Fetch calling state, camera state, and participants outside any conditional rendering
   const callingState = useCallCallingState();
   const { user } = useUser();
   const { microphone, isMute: isMicrophoneMuted } = useMicrophoneState();
   const { camera, isMute: isCameraMuted } = useCameraState();
-  const participants = useParticipants(); // Directly using the participants list
+  const participants = useParticipants();
 
-  // Wait until the user has joined the call before rendering the UI
   if (callingState !== CallingState.JOINED) return <Loader />;
 
   const toggleMute = async () => {
     if (isMicrophoneMuted) {
-      await microphone.enable(); // Unmute the microphone
+      await microphone.enable();
     } else {
-      await microphone.disable(); // Mute the microphone
+      await microphone.disable();
     }
-    setIsMuted(!isMicrophoneMuted); // Toggle mute state
+    setIsMuted(!isMicrophoneMuted);
   };
 
   const toggleVideo = async () => {
     if (isVideoOff) {
-      await camera.enable(); // Turn on the video
+      await camera.enable();
     } else {
-      await camera.disable(); // Turn off the video
+      await camera.disable();
     }
-    setIsVideoOff(!isVideoOff); // Toggle video state
-  };
-
-  // Dynamically calculate tile size based on the number of participants
-  const getTileSize = (numParticipants: number) => {
-    if (numParticipants <= 3) {
-      return "w-[450px] h-[300px]"; // Larger tiles for fewer participants
-    }
-    if (numParticipants <= 6) {
-      return "w-[350px] h-[250px]"; // Medium-sized tiles for moderate participants
-    }
-    return "w-[250px] h-[180px]"; // Smaller tiles for many participants
+    setIsVideoOff(!isVideoOff);
   };
 
   const endCall = async () => {
     calls[0].leave();
-    router.push('/');
+    router.push("/");
+  };
+
+  const getTileSize = (numParticipants: number) => {
+    if (numParticipants <= 3) {
+      return "w-full h-[300px] sm:w-[450px] sm:h-[350px]";
+    }
+    if (numParticipants <= 6) {
+      return "w-[280px] h-[200px] sm:w-[350px] sm:h-[250px]";
+    }
+    return "w-[200px] h-[150px] sm:w-[250px] sm:h-[180px]";
   };
 
   return (
-    <section className="min-h-screen w-full text-white bg-dark-2">
-      {/* Video layout and call controls */}
-      <div className="flex w-full items-center justify-between gap-5 py-4 px-8 bg-gray-800 bg-opacity-60 rounded-b-xl shadow-lg">
-        {/* Layout and stats buttons */}
-        <div className="flex items-center space-x-3">
-          <span className="text-white">
+    <section className="min-h-screen w-full bg-dark-2 text-white">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-5 py-4 px-4 md:px-8 bg-gray-800 bg-opacity-60 rounded-b-xl shadow-lg">
+        <div className="text-center md:text-left">
+          <span className="text-white text-lg">
             {user?.firstName} {user?.lastName || ""}
           </span>
         </div>
-
-        {/* Participant and End Call controls */}
-        <div className="flex items-center space-x-4">
-          {/* Mute/Unmute mic button */}
+        <div className="flex flex-wrap items-center justify-center gap-4">
           <button
             onClick={toggleMute}
             className={`cursor-pointer rounded-lg px-4 py-2 transition-colors duration-200 ${
-              isMuted ? "bg-red-600 hover:bg-red-700" : "bg-[#19232d] hover:bg-[#4c535b]"
+              isMuted
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-[#19232d] hover:bg-[#4c535b]"
             }`}
           >
             <AiOutlineAudio
@@ -131,12 +131,12 @@ const MeetingRoom = () => {
               }`}
             />
           </button>
-
-          {/* Toggle video on/off button */}
           <button
             onClick={toggleVideo}
             className={`cursor-pointer rounded-lg px-4 py-2 transition-colors duration-200 ${
-              isVideoOff ? "bg-red-600 hover:bg-red-700" : "bg-[#19232d] hover:bg-[#4c535b]"
+              isVideoOff
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-[#19232d] hover:bg-[#4c535b]"
             }`}
           >
             <AiOutlineVideoCamera
@@ -145,8 +145,6 @@ const MeetingRoom = () => {
               }`}
             />
           </button>
-
-          {/* End Call button */}
           {!isPersonalRoom && (
             <button
               onClick={endCall}
@@ -158,21 +156,29 @@ const MeetingRoom = () => {
         </div>
       </div>
 
-      {/* Participant Tiles */}
+      {/* Participants Section */}
       <div
-        className="flex w-full h-screen  overflow-auto flex-wrap justify-around gap-y-12 p-3 pt-8 gap-4 scrollbar-none"
+        className="flex w-full h-screen overflow-auto flex-wrap justify-center md:justify-around gap-6 p-3 pt-8 scrollbar-none"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {participants.map((participant) => (
           <div
             key={participant.sessionId}
-            className={` ${getTileSize(participants.length)} rounded-md flex  justify-center items-center`}
+            className={`flex justify-center transition-all ease-in duration-150  ${participant.isSpeaking ? "border-4 border-blue-400":""} flex-col mb-4 h-[230px]  sm:mb-[70px] md:mb-[100px] lg:mb-[40px]  gap-3   ${getTileSize(
+              participants.length
+            )} rounded-md`}
           >
-            
+
             <ParticipantView
-              VideoPlaceholder={CustomVideoPlaceholder}
+              VideoPlaceholder={(props) => (
+                <CustomVideoPlaceholder
+                  {...props}
+                  numParticipants={participants.length}
+                  getTileSize={getTileSize}
+                />
+              )}
               participant={participant}
-              className="w-full  h-full "
+              className="w-full rounded-full h-full "
             />
           </div>
         ))}

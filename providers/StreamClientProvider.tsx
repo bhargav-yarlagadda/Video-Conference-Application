@@ -5,11 +5,12 @@ import { StreamVideoClient, StreamVideo } from "@stream-io/video-react-sdk";
 import { useUser } from "@clerk/nextjs";
 import { tokenProvider } from "@/actions/stream.actions";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 const Loader = () => {
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-24 h-24 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 };
@@ -17,8 +18,9 @@ const Loader = () => {
 const API_KEY = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 
 const StreamVideoProvider = ({ children }: { children: ReactNode }) => {
-  const [videoClient, setVideoClient] = useState<StreamVideoClient>();
+  const [videoClient, setVideoClient] = useState<StreamVideoClient | null>(null);
   const { user, isLoaded } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -31,17 +33,24 @@ const StreamVideoProvider = ({ children }: { children: ReactNode }) => {
         name: user?.username || user?.id,
         image: user?.imageUrl,
       },
-      tokenProvider:tokenProvider
+      tokenProvider: tokenProvider,
     });
 
     setVideoClient(client);
   }, [user, isLoaded]);
 
-  if (!videoClient) return <Loader />;
+  // Navigate to sign-in if videoClient is null
+  useEffect(() => {
+    if (!videoClient && isLoaded && !user) {
+      router.push("/sign-in");
+    }
+  }, [videoClient, isLoaded, user, router]);
 
-  return <StreamVideo client={videoClient}>
-    {children}
-    </StreamVideo>;
+  if (!videoClient) {
+    return <Loader />;
+  }
+
+  return <StreamVideo client={videoClient}>{children}</StreamVideo>;
 };
 
 export default StreamVideoProvider;

@@ -1,13 +1,19 @@
+'use client'
 import MeetingTypeList from '@/components/MeetingTypeList';
 import BgImage from '../../../public/images/hero-background.png';
 import Image from 'next/image';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 const Home = () => {
   const now = new Date();
-
+  const router = useRouter()
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   const date = new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(now);
-
+  const {isLoaded,isSignedIn} = useUser()
+  if(isLoaded && ! isSignedIn){
+    router.push('/sign-in')
+  }
   return (
     <div className="flex flex-col items-center text-white ">
       {/* Hero Section */}
