@@ -29,11 +29,9 @@ cd meeting-room-app
 ### Step 2: install the deps
 
 ```bash
-### Step 1: Clone the repository
-
-```bash
-git clone https://github.com/your-repo/meeting-room-app.git
-cd meeting-room-app
+npm install
+# or if you prefer yarn
+yarn install
 ```
 
 
