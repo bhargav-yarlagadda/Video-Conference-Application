@@ -131,9 +131,7 @@ const MeetingTypeList = () => {
         image="/icons/add-meeting.svg"
         buttonText="Start Meeting"
         buttonClassName="bg-red-500 hover:bg-red-600"
-        handleClick={() => {
-
-          
+        handleClick={() => {          
           setMeetingState(undefined);
         }}
       >

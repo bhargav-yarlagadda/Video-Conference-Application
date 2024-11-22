@@ -3,6 +3,7 @@ import {
 
 } from '@clerk/nextjs'
 import './globals.css'
+import "@stream-io/video-react-sdk/dist/css/styles.css";
 export default function RootLayout({
   children,
 }: {

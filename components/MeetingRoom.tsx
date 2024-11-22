@@ -1,17 +1,14 @@
 "use client";
-
-import { useState } from "react";
 import {
-  CallStatsButton,
   CallingState,
   useCallStateHooks,
   ParticipantView,
+  useCall,
 } from "@stream-io/video-react-sdk";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AiOutlineAudio, AiOutlineVideoCamera } from "react-icons/ai";
 import { useUser } from "@clerk/nextjs";
-import { StreamVideoParticipant } from "@stream-io/video-react-sdk";
 import { useCalls } from "@stream-io/video-react-sdk";
+import { CallControls } from "@stream-io/video-react-sdk";
 
 const Loader = () => (
   <div className="flex justify-center items-center h-screen">
@@ -54,43 +51,23 @@ const CustomVideoPlaceholder = ({
 
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
-  const isPersonalRoom = !!searchParams.get("personal");
+  const isPersonalRoom = !! searchParams.get("personal");
   const router = useRouter();
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
+
   const {
     useCallCallingState,
-    useMicrophoneState,
-    useCameraState,
+
     useParticipants,
   } = useCallStateHooks();
   const calls = useCalls();
 
   const callingState = useCallCallingState();
   const { user } = useUser();
-  const { microphone, isMute: isMicrophoneMuted } = useMicrophoneState();
-  const { camera, isMute: isCameraMuted } = useCameraState();
   const participants = useParticipants();
 
   if (callingState !== CallingState.JOINED) return <Loader />;
 
-  const toggleMute = async () => {
-    if (isMicrophoneMuted) {
-      await microphone.enable();
-    } else {
-      await microphone.disable();
-    }
-    setIsMuted(!isMicrophoneMuted);
-  };
 
-  const toggleVideo = async () => {
-    if (isVideoOff) {
-      await camera.enable();
-    } else {
-      await camera.disable();
-    }
-    setIsVideoOff(!isVideoOff);
-  };
 
   const endCall = async () => {
     calls[0].leave();
@@ -117,42 +94,13 @@ const MeetingRoom = () => {
           </span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <button
-            onClick={toggleMute}
-            className={`cursor-pointer rounded-lg px-4 py-2 transition-colors duration-200 ${
-              isMuted
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-[#19232d] hover:bg-[#4c535b]"
-            }`}
-          >
-            <AiOutlineAudio
-              className={`w-5 h-5 text-white transition-all duration-200 ${
-                isMuted ? "text-red-500" : ""
-              }`}
-            />
-          </button>
-          <button
-            onClick={toggleVideo}
-            className={`cursor-pointer rounded-lg px-4 py-2 transition-colors duration-200 ${
-              isVideoOff
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-[#19232d] hover:bg-[#4c535b]"
-            }`}
-          >
-            <AiOutlineVideoCamera
-              className={`w-5 h-5 text-white transition-all duration-200 ${
-                isVideoOff ? "text-red-500" : ""
-              }`}
-            />
-          </button>
-          {!isPersonalRoom && (
-            <button
-              onClick={endCall}
-              className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700 text-white transition-colors duration-200"
-            >
-              End Call
-            </button>
-          )}
+          <CallControls onLeave={endCall} />
+        </div>
+        <div>
+          {
+            !isPersonalRoom && <EndCallForEveryone/>
+              
+          }
         </div>
       </div>
 
@@ -164,7 +112,7 @@ const MeetingRoom = () => {
         {participants.map((participant) => (
           <div
             key={participant.sessionId}
-            className={`flex justify-center transition-all ease-in duration-150  ${participant.isSpeaking ? "border-4 border-blue-400":""} flex-col mb-4 h-[230px]  sm:mb-[70px] md:mb-[100px] lg:mb-[40px]  gap-3   ${getTileSize(
+            className={`flex justify-center transition-all ease-in duration-150  flex-col mb-4 h-[230px]  sm:mb-[70px] md:mb-[100px] lg:mb-[40px]  gap-3   ${getTileSize(
               participants.length
             )} rounded-md`}
           >
@@ -183,8 +131,36 @@ const MeetingRoom = () => {
           </div>
         ))}
       </div>
+
     </section>
   );
 };
 
 export default MeetingRoom;
+
+
+const EndCallForEveryone = () => {
+  const call = useCall();
+  const { useLocalParticipant } = useCallStateHooks();
+  const localParticipant = useLocalParticipant();
+  const router = useRouter()
+  const isMeetingOwner =
+    localParticipant &&
+    call?.state.createdBy &&
+    localParticipant.userId === call.state.createdBy.id;
+
+  return (
+    <>
+      {isMeetingOwner ? (
+        <button
+          onClick={() => {
+            call?.endCall();
+            router.push('/')
+          }}
+          className="w-[140px] text-sm h-[30px] rounded-md bg-red-500">
+          End call for everyone
+        </button>
+      ) : null}
+    </>
+  );
+};

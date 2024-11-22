@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 const Loader = () => {
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center bg-black h-screen">
       <div className="w-24 h-24 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
@@ -25,12 +25,11 @@ const StreamVideoProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!isLoaded || !user) return;
     if (!API_KEY) throw new Error("Stream API key is missing");
-
     const client = new StreamVideoClient({
       apiKey: API_KEY,
       user: {
         id: user?.id,
-        name: user?.username || user?.id,
+        name: `${user?.firstName} ${user?.lastName}` || "Guest",
         image: user?.imageUrl,
       },
       tokenProvider: tokenProvider,
