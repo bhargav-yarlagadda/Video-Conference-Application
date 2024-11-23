@@ -2,18 +2,18 @@ import CallList from "../../../../components/CallList";
 import type { Metadata } from 'next'
  
 export const metadata: Metadata = {
-  title: 'Conferencer | Upcoming',
+  title: 'Conferencer | History',
   description: '...',
 }
  
-const UpcomingPage = () => {
+const Previous = () => {
   return (
     <section className="flex size-full flex-col gap-10 text-white">
       <h1 className="text-3xl font-bold">Upcoming Meeting</h1>
 
-      <CallList type="upcoming" />
+      <CallList type="ended" />
     </section>
   );
 };
 
-export default UpcomingPage;
+export default Previous;

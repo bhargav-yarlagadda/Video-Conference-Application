@@ -10,10 +10,8 @@ export const useGetCalls = () => {
 
   useEffect(() => {
     const loadCalls = async () => {
-      if (!client || !user?.id) return;
-      
+      if (!client || !user?.id) return;   
       setIsLoading(true);
-
       try {
         // https://getstream.io/video/docs/react/guides/querying-calls/#filters
         const { calls } = await client.queryCalls({
