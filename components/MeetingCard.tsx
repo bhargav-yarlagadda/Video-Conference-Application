@@ -43,7 +43,7 @@ const MeetingCard = ({
       <article className="flex flex-col gap-1">
         <div className="flex items-center gap-3">
           <Image src={icon} alt="meeting icon" width={30} height={30} />
-          <h1 className="text-3xl font-semibold text-white">{title}</h1>c
+          <h1 className="text-3xl font-semibold text-white">{title}</h1>
         </div>
         <p className="text-lg font-thin text-gray-100">Created By: <span className="text-blue-600">{user?.firstName}</span></p>
         <p className="text-base text-gray-400">scheduled at  <span className="font-bold text-white" >{date}</span></p>
