@@ -1,4 +1,11 @@
 import { SignIn } from '@clerk/nextjs';
+import { Metadata } from 'next';
+
+
+export const metadata: Metadata = {
+  title: 'Conferencer | Sign In',
+  description: 'A workspace for your team, powered by Stream Chat and Clerk.',
+};
 
 export default function SiginInPage() {
   return (
