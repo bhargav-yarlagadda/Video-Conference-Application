@@ -4,10 +4,12 @@ import MeetingModal from "./MeetingModal";
 import { useUser } from "@clerk/nextjs";
 import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { useRouter } from "next/navigation";
-import ReactDatePicker from 'react-datepicker'
+import ReactDatePicker from "react-datepicker";
 const MeetingTypeList = () => {
   const router = useRouter();
-  const [meetingState, setMeetingState] = useState<"isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined>(undefined); // Popup visibility state
+  const [meetingState, setMeetingState] = useState<
+    "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
+  >(undefined); // Popup visibility state
   const { user } = useUser();
   const client = useStreamVideoClient();
   const [values, setValues] = useState({
@@ -16,7 +18,7 @@ const MeetingTypeList = () => {
     link: "",
   });
   const [callDetails, setCallDetails] = useState<Call>();
-  
+
   const createMeeting = async () => {
     if (!client || !user) return;
     try {
@@ -26,7 +28,8 @@ const MeetingTypeList = () => {
       const id = crypto.randomUUID();
       const call = client.call("default", id);
       if (!call) throw new Error("Failed to create meeting");
-      const startsAt = values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+      const startsAt =
+        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
       const description = values.description || "Instant Meeting";
       await call.getOrCreate({
         data: {
@@ -44,11 +47,9 @@ const MeetingTypeList = () => {
       console.error(error);
     }
   };
-  
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
-  
 
-  
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
+  const [enteredCode,setEnteredCode] = useState<String>()
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
       <HomeCard
@@ -79,63 +80,85 @@ const MeetingTypeList = () => {
         img="/icons/recordings.svg"
         title="View Recordings"
         description="Meeting Recordings"
+        handleClick={() => {
+          router.push("/recordings");
+        }}
         className="bg-yellow-500  hover:scale-105 transition-all ease-in duration-200"
       />
 
       {/* Schedule Meeting Modal */}
-      {! callDetails ? (
-         <MeetingModal
-         isOpen={meetingState === 'isScheduleMeeting'}
-         onClose={() => setMeetingState(undefined)}
-         title="Create Meeting"
-         handleClick={createMeeting}
-         buttonClassName="bg-blue-500"
-         buttonText="Schedule Meeting"
-         buttonIcon=""
-       >
-         <div className="flex flex-col gap-2.5">
-           <label className="text-base font-normal leading-[22.4px] text-sky-2">
-             Add a description
-           </label>
-           <input
-             className="border-none py-3 text-lg p-2 rounded-sm  bg-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0"
-             onChange={(e) =>
-               setValues({ ...values, description: e.target.value })
-             }
-           />
-           <div>
-            <label htmlFor="">select a date</label>
-            <ReactDatePicker
-            selected={values.dateTime}
-            onChange={(date)=>{
-              setValues({...values,dateTime:date!})
-            }}
-            showTimeSelect
-            timeFormat="hh:mm"
-            
-            timeCaption="time"
-            dateFormat={"MMMM d, yyyy h:mm aa  "}
-            className="w-full rounded-sm ms-4 bg-gray-700 p-2"
+      {!callDetails ? (
+        <MeetingModal
+          isOpen={meetingState === "isScheduleMeeting"}
+          onClose={() => setMeetingState(undefined)}
+          title="Create Meeting"
+          handleClick={createMeeting}
+          buttonClassName="bg-blue-500"
+          buttonText="Schedule Meeting"
+          buttonIcon=""
+        >
+          <div className="flex flex-col gap-2.5">
+            <label className="text-base font-normal leading-[22.4px] text-sky-2">
+              Add a description
+            </label>
+            <input
+              className="border-none py-3 text-lg p-2 rounded-sm  bg-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+              onChange={(e) =>
+                setValues({ ...values, description: e.target.value })
+              }
             />
-           </div>
+            <div>
+              <label htmlFor="">select a date</label>
+              <ReactDatePicker
+                selected={values.dateTime}
+                onChange={(date) => {
+                  setValues({ ...values, dateTime: date! });
+                }}
+                showTimeSelect
+                timeFormat="hh:mm"
+                timeCaption="time"
+                dateFormat={"MMMM d, yyyy h:mm aa  "}
+                className="w-full rounded-sm ms-4 bg-gray-700 p-2"
+              />
+            </div>
           </div>
-           </MeetingModal>
+        </MeetingModal>
       ) : (
         <MeetingModal
-        isOpen={meetingState === 'isScheduleMeeting'}
-        onClose={() => setMeetingState(undefined)}
-        title="Meeting Created"
-        handleClick={() => {
-          navigator.clipboard.writeText(meetingLink);
-         
-        }}
-        image={'/icons/checked.svg'}
-        buttonIcon="/icons/copy.svg"
-        className="text-center"
-        buttonText="Copy Meeting Link">
-        </MeetingModal>
+          isOpen={meetingState === "isScheduleMeeting"}
+          onClose={() => setMeetingState(undefined)}
+          title="Meeting Created"
+          handleClick={() => {
+            navigator.clipboard.writeText(meetingLink);
+          }}
+          image={"/icons/checked.svg"}
+          buttonIcon="/icons/copy.svg"
+          className="text-center"
+          buttonText="Copy Meeting Link"
+        ></MeetingModal>
       )}
 
+      <MeetingModal
+        isOpen={meetingState === "isJoiningMeeting"}
+        onClose={() => setMeetingState(undefined)}
+        title="Enter Meet Code"
+        image={"/icons/checked.svg"}
+        handleClick={() => {
+          router.push(`/meeting/${enteredCode}`);
+        }}
+        buttonIcon="/icons/copy.svg"
+        className="text-center"
+        buttonText="Join Meet"
+      >
+        <div className="flex justify-center items-center">
+          <input
+            onChange={(e)=>{setEnteredCode(e.target.value)}}
+            type="text"
+            placeholder="Enter text here"
+            className="w-full max-w-md px-4 py-2 border bg-gray-600 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400"
+          />
+        </div>
+      </MeetingModal>
       {/* Show Popup if needed */}
     </section>
   );

@@ -73,7 +73,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
       {calls && calls.length > 0 ? (
         calls.map((meeting : Call | CallRecording) => (
           <MeetingCard
-            key={(meeting as Call).id}
+            key={crypto.randomUUID()}
             icon={
               type === 'ended'
                 ? '/icons/previous.svg'

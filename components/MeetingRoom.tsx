@@ -4,56 +4,25 @@ import {
   useCallStateHooks,
   ParticipantView,
   useCall,
+  Call,
 } from "@stream-io/video-react-sdk";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useCalls } from "@stream-io/video-react-sdk";
 import { CallControls } from "@stream-io/video-react-sdk";
-
+import { CopyButton } from "@mantine/core";
+import { CustomVideoPlaceholder } from "./CustomVideoPlaceholder";
 const Loader = () => (
   <div className="flex justify-center items-center h-screen">
     <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
   </div>
 );
-const CustomVideoPlaceholder = ({
-  participant,
-  numParticipants,
-  getTileSize,
-}: {
-  participant: any;
-  numParticipants: number;
-  getTileSize: (numParticipants: number) => string;
-}) => {
-  const tileSizeClass = getTileSize(numParticipants);
 
-  return (
-    <div
-      className={`flex justify-center items-center rounded-md bg-blue-500/10 ${tileSizeClass} ${
-        participant.isSpeaking
-          ? "border-4 border-blue-600"
-          : "border-2 border-gray-400"
-      }`}
-    >
-      {participant.image ? (
-        <img
-          className="w-24 h-24 rounded-full"
-          src={participant.image}
-          alt={participant.sessionId}
-        />
-      ) : (
-        <span className="text-gray-600">
-          {participant.name || "Guest User"}
-        </span>
-      )}
-    </div>
-  );
-};
 
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
-  const isPersonalRoom = !! searchParams.get("personal");
+  const isPersonalRoom = !!searchParams.get("personal");
   const router = useRouter();
-
   const {
     useCallCallingState,
 
@@ -64,13 +33,13 @@ const MeetingRoom = () => {
   const callingState = useCallCallingState();
   const { user } = useUser();
   const participants = useParticipants();
-
+  const roomId = calls[0]?.cid.split(":")[1];
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${roomId}`;
   if (callingState !== CallingState.JOINED) return <Loader />;
-
-
-
   const endCall = async () => {
-    calls[0].leave();
+    if (calls[0]) {
+      await calls[0]?.leave();
+    }
     router.push("/");
   };
 
@@ -95,13 +64,26 @@ const MeetingRoom = () => {
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <CallControls onLeave={endCall} />
-        </div>
-        <div>
-          {
-            !isPersonalRoom && <EndCallForEveryone/>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+            onClick={() => {
+              navigator.clipboard.writeText(meetingLink);
               
-          }
+            }}
+          >
+              Copy Meet Link
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+            onClick={() => {
+              navigator.clipboard.writeText(roomId);
+              
+            }}
+          >
+              Copy Meet Code
+          </button>
         </div>
+        <div>{!isPersonalRoom && <EndCallForEveryone />}</div>
       </div>
 
       {/* Participants Section */}
@@ -116,7 +98,6 @@ const MeetingRoom = () => {
               participants.length
             )} rounded-md`}
           >
-
             <ParticipantView
               VideoPlaceholder={(props) => (
                 <CustomVideoPlaceholder
@@ -131,19 +112,17 @@ const MeetingRoom = () => {
           </div>
         ))}
       </div>
-
     </section>
   );
 };
 
 export default MeetingRoom;
 
-
 const EndCallForEveryone = () => {
   const call = useCall();
   const { useLocalParticipant } = useCallStateHooks();
   const localParticipant = useLocalParticipant();
-  const router = useRouter()
+  const router = useRouter();
   const isMeetingOwner =
     localParticipant &&
     call?.state.createdBy &&
@@ -155,9 +134,10 @@ const EndCallForEveryone = () => {
         <button
           onClick={() => {
             call?.endCall();
-            router.push('/')
+            router.push("/");
           }}
-          className="w-[140px] text-sm h-[30px] rounded-md bg-red-500">
+          className="w-[140px] text-sm h-[30px] rounded-md bg-red-500"
+        >
           End call for everyone
         </button>
       ) : null}
