@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { StreamCall, StreamTheme } from '@stream-io/video-react-sdk';
 import { useParams } from 'next/navigation';
-
+import CallNotFound from '@/components/CallNotFound';
  
 
 import { useGetCallById } from '@/hooks/useGetCallById';
@@ -28,10 +28,9 @@ const MeetingPage = () => {
 
   if (!isLoaded || isCallLoading) return <Loader />;
 
-  if (!call) return (
-    <p className="text-center text-3xl font-bold text-white">
-      Call Not Found
-    </p>
+  if (!call)
+    return(
+      <CallNotFound/>
   );
 
   // get more info about custom call type:  https://getstream.io/video/docs/react/guides/configuring-call-types/
@@ -43,7 +42,6 @@ const MeetingPage = () => {
     <main className="h-screen w-full">
       <StreamCall call={call}>
         <StreamTheme>
-
         {!isSetupComplete ? (
           <MeetingSetup setIsSetupComplete={setIsSetupComplete} />
         ) : (

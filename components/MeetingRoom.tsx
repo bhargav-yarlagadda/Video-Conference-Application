@@ -38,9 +38,13 @@ const MeetingRoom = () => {
   if (callingState !== CallingState.JOINED) return <Loader />;
   const endCall = async () => {
     if (calls[0]) {
-      await calls[0]?.leave();
+      try{
+        await calls[0]?.leave();
+      }catch(e){
+        router.push('/')
+      }
+      router.push("/");
     }
-    router.push("/");
   };
 
   const getTileSize = (numParticipants: number) => {
