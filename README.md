@@ -56,6 +56,9 @@ CLERK_API_URL=<your-clerk-api-url>
 NEXT_PUBLIC_STREAM_API_KEY=<your-stream-api-key>
 NEXT_PUBLIC_STREAM_APP_ID=<your-stream-app-id>
 
+#base your for routing with in the application
+NEXT_PUBLIC_BASE_URL = http://localhost:3000
+
 ```
 
 
