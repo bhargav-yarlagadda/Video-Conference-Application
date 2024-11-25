@@ -2,7 +2,7 @@ import CallList from "../../../../components/CallList";
 import type { Metadata } from 'next'
  
 export const metadata: Metadata = {
-  title: 'Conferencer | Upcoming',
+  title: 'Conferencer | Recording',
   description: '...',
 }
  
