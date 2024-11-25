@@ -19,7 +19,7 @@ export const CustomVideoPlaceholder = ({
       >
         {participant.image ? (
           <img
-            className="w-24 h-24 rounded-full"
+            className="w-20 h-20 lg:w-40 lg:h-40 rounded-full"
             src={participant.image}
             alt={participant.sessionId}
           />
