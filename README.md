@@ -30,8 +30,12 @@ cd meeting-room-app
 
 ```bash
 npm install
-# or if you prefer yarn
+# Or, if you prefer Yarn:
 yarn install
+
+# If 'npm install' shows deprecated package warnings, use the command below:
+npm install --legacy-peer-deps
+
 ```
 
 
