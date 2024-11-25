@@ -4,10 +4,14 @@ A real-time video conferencing application built with **Next.js**, **Stream Vide
 
 ## Features
 
-- Real-time video conferencing with customizable video tiles.
-- Microphone and camera controls (Mute/Unmute, Video On/Off).
-- Participant view with placeholders and real-time updates.
-- Integration with **Clerk** for user authentication.
+- Real-time video conferencing with customizable video tiles.  
+- View and join upcoming meetings with ease.  
+- Schedule meetings with a simple and intuitive interface.  
+- View details of ended meetings for reference.  
+- Access and manage recordings saved by the user.  
+- Microphone and camera controls (Mute/Unmute, Video On/Off).  
+- Participant view with placeholders and real-time updates.  
+- Seamless integration with **Clerk** for user authentication.  
 
 ## Prerequisites
 
