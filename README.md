@@ -44,7 +44,7 @@ npm install --legacy-peer-deps
 
 
 ### Step 3: Set up Environment Variables
-Create a `*.env.local*` file at the root of the project and add the following environment variables. These are required for Clerk authentication and the Stream API.
+Create a *`.env.local`* file at the root of the project and add the following environment variables. These are required for Clerk authentication and the Stream API.
 
 You can find your Clerk API keys and Stream API keys in their respective dashboards:
 
