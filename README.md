@@ -26,8 +26,8 @@ Ensure you have the following installed:
 ### Step 1: Clone the repository
 
 ```bash
-git clone https://github.com/your-repo/meeting-room-app.git
-cd meeting-room-app
+https://github.com/bhargav-yarlagadda/Video-Conference-Application.git
+cd Video-Conference-Application
 ```
 
 ### Step 2: install the deps
